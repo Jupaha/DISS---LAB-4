@@ -124,43 +124,36 @@ public class PhysicalRobot implements RobotInterface{
 	
 	/** Keine Steps. Durch Funktion direkte Geschwindigkeitsanpassung
 	 */
-	public void movePenJulius1(int xTarget, int yTarget) throws OutOfWorkspaceException{
+	public void movePenJulius1(double xStart, double xlength, int steps) throws OutOfWorkspaceException{
+		double xTarget = xStart+xlength;
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
-		double yNow;
-		double yDeviance;
-		double yDevianceAngle;
-		double ySum;
+		double yDeviance = Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle) - Calc.getYCenterToPen(getArmLength(), endAngle);;
+		double yStep = yDeviance/steps;
 		double necessaryWheelspeed;
+		double angleDifference = endAngle - startAngle;
+		double stepAngle = angleDifference/steps;
+		double toAngle;
+		double previousAngle;
+		double armSpeed = ARM.getMotorSpeed()/ARM.ARMGEARRATIO;
+		int i=1;
+				while(i < steps+1){
+				LCD.clear();
+	
+				toAngle = (i*stepAngle)+startAngle;	
+				previousAngle = startAngle+(i-1)*stepAngle;
+				necessaryWheelspeed = armSpeed*Math.sin(Math.toRadians(((stepAngle/2)+previousAngle)));
+	
+				WHEELS.setWheelSpeed(necessaryWheelspeed);
 				
-				yNow = WHEELS.getYCenter() + Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle);
-				yDeviance = yTarget - yNow;
-				yDevianceAngle = Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle) - Calc.getYCenterToPen(getArmLength(), endAngle);
-				ySum = yDevianceAngle + yDeviance;
+				moveWheels(yStep, true);
+				moveArmTo(toAngle, true);
 				
-				LCD.drawString(String.valueOf(ySum), 0, 6);
-				Button.ENTER.waitForPressAndRelease();
-				moveArmTo(endAngle, true);
-				moveWheels(ySum, true);
-				
-				
-				do{
-					necessaryWheelspeed = ARM.getRotationSpeed()*ArmModule.ARMLENGTH*Math.sin(Math.toRadians(ARM.getAngle())); // -90 ersetzen
-					WHEELS.setWheelSpeed(necessaryWheelspeed);
-				}while(ArmModule.isMoving()); // isMoving ins Interface //TODO: ERROR !!!!
-
-//				isMoving
-//
-//				public boolean isMoving()
-//				This method returns true if the motor is attempting to rotate. The return value may not correspond to the actual motor movement.
-//				For example, If the motor is stalled, isMoving() will return true. 
-//				After flt() is called, this method will return false even though the motor axle may continue to rotate by inertia. If the motor is stalled, isMoving() will return true. . A stall can be detected by calling isStalled();
-//				Specified by:
-//				isMoving in interface BaseMotor
-//				Returns:
-//				true iff the motor is attempting to rotate.
 				waitForArm();
 				waitForWheels();
+				
+				i++;
+				}
 	}
 	
 	/** Mit Steps. Fuer jeden Step Geschwindigkeitsanpassung durch Funktion
@@ -170,7 +163,8 @@ public class PhysicalRobot implements RobotInterface{
 	 * durch die Forschleife wird bei jedem durchlauf eine distanz in einer berechneten geschwindigkeit durchlaufen
 	 * summe der distanzen ergibt die gesamt distanz
 	 */
-	public void movePenJulius2(int xTarget, int yTarget, int steps) throws OutOfWorkspaceException{
+	public void movePenJulius2(double xStart, double xlength, int steps) throws OutOfWorkspaceException{
+		double xTarget = xStart+xlength;
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
 		double yNow;
@@ -178,22 +172,22 @@ public class PhysicalRobot implements RobotInterface{
 		double yDevianceAngle;
 		double ySum;
 		double yStep;
-		double necessaryWheelspeed;
-				
-				yNow = WHEELS.getYCenter() + Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle);
-				yDeviance = yTarget - yNow;
+		double necessaryWheelspeed;	
+		
 				yDevianceAngle = Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle) - Calc.getYCenterToPen(getArmLength(), endAngle);
-				ySum = yDevianceAngle + yDeviance;
+				ySum = yDevianceAngle;
 				yStep = ySum/steps;
 				
 				moveArmTo(endAngle, true);
-				
-				for(int i1 = 1; i1 == steps; i1++){
-					necessaryWheelspeed = ARM.getRotationSpeed()*ArmModule.ARMLENGTH*Math.sin(Math.toRadians(ARM.getAngle())); // -90 ersetzen
+				int i = 1;
+				while(i < steps+1){
+					necessaryWheelspeed = ARM.getMotorSpeed()*ArmModule.ARMLENGTH*Math.sin(Math.toRadians(ARM.getAngle())); // -90 ersetzen
+					LCD.drawString("NSPD: " + String.valueOf(necessaryWheelspeed), 0, 6);
 					WHEELS.setWheelSpeed(necessaryWheelspeed);
 					moveWheels(yStep, true);
 					WHEELS.setWheelSpeed(necessaryWheelspeed);
 					waitForWheels();
+					i++;
 				}
 				waitForArm();
 	}
@@ -205,7 +199,8 @@ public class PhysicalRobot implements RobotInterface{
 	 * berechneter winkel und y distanz werden nacheinander gefahren
 	 * Geschwindigkeiten bleiben konstant
 	 */
-	public void movePenJulius3(int xTarget, int steps) throws OutOfWorkspaceException{
+	public void movePenJulius3(double xStart, double xlength, int steps) throws OutOfWorkspaceException{
+		double xTarget = xStart+xlength;
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
 		double angleDifference = endAngle - startAngle;
@@ -215,12 +210,14 @@ public class PhysicalRobot implements RobotInterface{
 		double yDevianceAngle;
 		double toAngle;
 		
-		for(int i1=1; i1 == steps; i1++){
-			gamma = i1*stepAngle;
+		int i = 1;
+		while(i < steps+1){
+			gamma = i*stepAngle;
 			yDevianceAngle = Math.sin(Math.toRadians(gamma))*sector;
-			toAngle = (i1*stepAngle)+startAngle;
+			toAngle = (i*stepAngle)+startAngle;
 			moveArmTo(toAngle, false);
 			moveWheels(yDevianceAngle, false);
+			i++;
 		}
 	}
 	
@@ -229,7 +226,8 @@ public class PhysicalRobot implements RobotInterface{
 	 * berechneter winkel und y distanz wird gleichzeitig gefahren
 	 * die benoetigte Geschwindigkeit wird fuer jeden durchlauf der for schleife neu berechnet
 	 */
-	public void movePenJulius4(int xTarget, int steps) throws OutOfWorkspaceException{
+	public void movePenJulius4(double xStart, double xlength, int steps) throws OutOfWorkspaceException{
+		double xTarget = xStart+xlength;
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
 		double angleDifference = endAngle - startAngle;
@@ -240,17 +238,24 @@ public class PhysicalRobot implements RobotInterface{
 		double toAngle;
 		double yDevianceAngle;
 		
-		for(int i1=1; i1 == steps; i1++){
+		int i = 1;
+		while(i < steps+1){
 			
-			toAngle = (i1*stepAngle)+startAngle;
-			gamma = i1*stepAngle;
+			toAngle = (i*stepAngle)+startAngle;
+			gamma = i*stepAngle;
 			yDevianceAngle = Math.sin(Math.toRadians(gamma))*sector;
-			necessaryWheelspeed = ARM.getRotationSpeed()*ArmModule.ARMLENGTH*Math.sin(Math.toRadians((i1-0.5)*stepAngle)); // -90 ersetzen
+			if(ARM.getRotationSpeed()==0){
+				moveArmTo(toAngle, true);
+			}else{
+			necessaryWheelspeed = ARM.getMotorSpeed()*ArmModule.ARMLENGTH*Math.sin(Math.toRadians((i-0.5)*stepAngle)); // -90 ersetzen
+			LCD.drawString("NSPD: " + String.valueOf(necessaryWheelspeed), 0, 6);
 			WHEELS.setWheelSpeed(necessaryWheelspeed);
 			moveArmTo(toAngle, true);
 			moveWheels(yDevianceAngle, true);
 			WHEELS.setWheelSpeed(necessaryWheelspeed);
 			waitForWheels();
+			};
+			i++;
 		}
 			waitForArm();
 	}

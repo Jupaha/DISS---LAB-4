@@ -24,7 +24,7 @@ public class Testbot {
 		
 		try {
 			//CHRIS
-			drawChris.movePenTo(0, 50);
+//			drawChris.movePenTo(0, 50);
 //			robot.setPen(true);
 //			drawChris.movePenToInStepsV3(-50, 50, 5);
 //			robot.setPen(false);
@@ -38,33 +38,43 @@ public class Testbot {
 //			robot.setPen(false);
 			
 			//JULIUS
-//			LCD.drawString("Julius Start", 0, 6);
-//			Button.ENTER.waitForPressAndRelease();
-//			robot.movePenTo(0, 50);
-//			robot.setPen(true);
-//			PhysicalRobot.ROBOT.movePenJulius1(-50, 50);
-//			LCD.drawString("1", 0, 6);
-//			Button.ENTER.waitForPressAndRelease();
-//			robot.setPen(false);
-//			robot.movePenTo(0, 80);
-//			robot.setPen(true);
-//			PhysicalRobot.ROBOT.movePenJulius2(-50, 80, 10);
-//			LCD.drawString("2", 0, 6);
-//			Button.ENTER.waitForPressAndRelease();
-//			robot.setPen(false);
-//			robot.movePenTo(0, 110);
-//			robot.setPen(true);
-//			PhysicalRobot.ROBOT.movePenJulius3(-50, 10);
-//			LCD.drawString("3", 0, 6);
-//			Button.ENTER.waitForPressAndRelease();
-//			robot.setPen(false);
-//			robot.movePenTo(0, 140);
-//			robot.setPen(true);
-//			PhysicalRobot.ROBOT.movePenJulius4(-50, 10);
-//			LCD.drawString("4", 0, 6);
-//			Button.ENTER.waitForPressAndRelease();
-//			robot.setPen(false);
+			robot.movePenTo(0, 50);
+			robot.setPen(true);
 			
+			LCD.drawString("Julius1", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			PhysicalRobot.ROBOT.movePenJulius1(-50, 0);
+			LCD.drawString("done1", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			robot.setPen(false);
+			robot.movePenTo(0, 80);
+			robot.setPen(true);
+			
+			LCD.drawString("Julius2", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			PhysicalRobot.ROBOT.movePenJulius2(-50, 10);
+			LCD.drawString("done2", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			robot.setPen(false);
+			robot.movePenTo(0, 110);
+			robot.setPen(true);
+
+			LCD.drawString("Julius3", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			PhysicalRobot.ROBOT.movePenJulius3(-50, 10);
+			LCD.drawString("done3", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			robot.setPen(false);
+			robot.movePenTo(0, 140);
+			robot.setPen(true);
+			
+			LCD.drawString("Julius4", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			PhysicalRobot.ROBOT.movePenJulius4(-50, 10);
+			LCD.drawString("done4", 0, 6);
+			Button.ENTER.waitForPressAndRelease();
+			robot.setPen(false);
+//			
 //			//LENNART
 //			try {
 //				robot.movePenToLennart(0, 50);
