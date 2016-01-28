@@ -127,7 +127,7 @@ public class PhysicalRobot implements RobotInterface{
 	public void movePenJulius1(int xTarget, int yTarget) throws OutOfWorkspaceException{
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
-		double yNow = WHEELS.getYCenter() + Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle);
+		double yNow;
 		double yDeviance;
 		double yDevianceAngle;
 		double ySum;
@@ -160,7 +160,9 @@ public class PhysicalRobot implements RobotInterface{
 				waitForWheels();
 	}
 	
-	/** Mit Steps. Fuer jeden Step Geschwindigkeitsanpassung durch Funktion
+	/** Geschwindigkeit wird in Steps angepasst.
+	 * Fuer jeden Step wird neue distanz fuer wheels berechnet
+	 * geschwindigkeitsanpassung durch Funktion
 	 * 
 	 * Der Arm wird mit konstanter geschwindigkeit gestartet,
 	 * 
@@ -170,7 +172,7 @@ public class PhysicalRobot implements RobotInterface{
 	public void movePenJulius2(int xTarget, int yTarget, int steps) throws OutOfWorkspaceException{
 		double startAngle = ARM.getAngle();
 		double endAngle = Calc.getAnglePen(ArmModule.ARMLENGTH, xTarget);
-		double yNow = WHEELS.getYCenter() + Calc.getYCenterToPen(ArmModule.ARMLENGTH, startAngle);
+		double yNow;
 		double yDeviance;
 		double yDevianceAngle;
 		double ySum;
